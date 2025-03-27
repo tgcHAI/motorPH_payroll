@@ -272,7 +272,7 @@ public class FinancePortal extends javax.swing.JFrame {
             }
         });
 
-        submitButton.setText("Submit");
+        submitButton.setText("Save Edit");
 
         refreshButton.setText("Refresh");
 

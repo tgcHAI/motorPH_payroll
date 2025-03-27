@@ -40,7 +40,6 @@ public class AdminPortal extends javax.swing.JFrame {
         welcomeBack = new javax.swing.JLabel();
         line = new javax.swing.JPanel();
         AdminPortalTXT = new javax.swing.JLabel();
-        viewPayrollRepPortal = new javax.swing.JButton();
         LogOutButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -136,7 +135,6 @@ public class AdminPortal extends javax.swing.JFrame {
 
         ViewEmpDetailsPortal.setBackground(new java.awt.Color(255, 255, 255));
         ViewEmpDetailsPortal.setFont(new java.awt.Font("STXihei", 1, 14)); // NOI18N
-        ViewEmpDetailsPortal.setForeground(new java.awt.Color(0, 0, 0));
         ViewEmpDetailsPortal.setText("View Employee Details");
         ViewEmpDetailsPortal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -146,7 +144,6 @@ public class AdminPortal extends javax.swing.JFrame {
 
         UpdateEmpDetailsPortal.setBackground(new java.awt.Color(255, 255, 255));
         UpdateEmpDetailsPortal.setFont(new java.awt.Font("STXihei", 1, 14)); // NOI18N
-        UpdateEmpDetailsPortal.setForeground(new java.awt.Color(0, 0, 0));
         UpdateEmpDetailsPortal.setText("Update Employee Details");
         UpdateEmpDetailsPortal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -180,16 +177,6 @@ public class AdminPortal extends javax.swing.JFrame {
         AdminPortalTXT.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         AdminPortalTXT.setText("to Admin Portal");
 
-        viewPayrollRepPortal.setBackground(new java.awt.Color(255, 255, 255));
-        viewPayrollRepPortal.setFont(new java.awt.Font("STXihei", 1, 14)); // NOI18N
-        viewPayrollRepPortal.setForeground(new java.awt.Color(0, 0, 0));
-        viewPayrollRepPortal.setText("View Payroll Reports");
-        viewPayrollRepPortal.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                viewPayrollRepPortalActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -203,18 +190,13 @@ public class AdminPortal extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                    .addComponent(line, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(line, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(21, 21, 21)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(AdminPortalTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(welcomeBack, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(165, 165, 165))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(viewPayrollRepPortal, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(169, 169, 169))))
+                            .addComponent(AdminPortalTXT, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(welcomeBack, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(165, 165, 165))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,9 +211,7 @@ public class AdminPortal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ViewEmpDetailsPortal, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(UpdateEmpDetailsPortal, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(viewPayrollRepPortal, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
         LogOutButton.setFont(new java.awt.Font("Segoe UI Emoji", 0, 12)); // NOI18N
@@ -359,10 +339,6 @@ public class AdminPortal extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_exitButtonMouseClicked
 
-    private void viewPayrollRepPortalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewPayrollRepPortalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_viewPayrollRepPortalActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -412,7 +388,6 @@ public class AdminPortal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel line;
     private javax.swing.JLabel minimizeButton;
-    private javax.swing.JButton viewPayrollRepPortal;
     private javax.swing.JLabel welcomeBack;
     // End of variables declaration//GEN-END:variables
 }

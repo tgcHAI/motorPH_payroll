@@ -743,7 +743,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="submitButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Submit"/>
+                <Property name="text" type="java.lang.String" value="Save Edit"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="refreshButton">
