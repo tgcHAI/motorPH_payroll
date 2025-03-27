@@ -11,7 +11,7 @@ public class Finance extends User {
     public static String getEMPLOYEE_DATA_FILE() {
         return EMPLOYEE_DATA_FILE;
     }
-    //comment, I made the mistake of commiting this wrong on netbeans instead of github
+    //comment, I made the mistake of commiting this wrong on netbeans instead of github desktop
     //data fields
     private double basicSalary;
     private double hourlyRate;
