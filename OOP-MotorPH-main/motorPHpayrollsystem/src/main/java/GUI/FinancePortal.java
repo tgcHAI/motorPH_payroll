@@ -483,7 +483,7 @@ public class FinancePortal extends javax.swing.JFrame {
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void calculateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateButtonActionPerformed
-          String employeeID = employeeIDField.getText().trim();
+    String employeeID = employeeIDField.getText().trim();
     if (employeeID.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Please enter an Employee ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
         return;

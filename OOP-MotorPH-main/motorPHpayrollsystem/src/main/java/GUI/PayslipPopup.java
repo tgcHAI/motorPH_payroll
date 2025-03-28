@@ -20,6 +20,7 @@ public final class PayslipPopup extends javax.swing.JFrame {
         this.employeeID = employeeID;
         empNumDisplay.setText(employeeID);
         populatePayslipFields();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     private PayslipPopup() {

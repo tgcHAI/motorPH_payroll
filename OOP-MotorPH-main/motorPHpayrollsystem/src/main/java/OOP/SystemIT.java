@@ -5,12 +5,12 @@ import javax.swing.*;
 import java.io.*;
 
 public class SystemIT extends User {
-    public static final String EMPLOYEE_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\actual payroll\\motorPH_payroll\\OOP-MotorPH-main\\motorPHpayrollsystem\\src\\main\\java\\CSV\\EmpData.csv";
-    private static final String ADMIN_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\OOP-MotorPH\\OOP-MotorPH-main\\OOP-MotorPH\\src\\main\\java\\CSV\\AdminLogin.csv";
-    public static final String HR_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\OOP-MotorPH\\OOP-MotorPH-main\\OOP-MotorPH\\src\\main\\java\\CSV\\HRLogin.csv";
-    private static final String FINANCE_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\OOP-MotorPH\\OOP-MotorPH-main\\OOP-MotorPH\\src\\main\\java\\CSV\\FinanceLogin.csv";
-    public static final String ATTENDANCE_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\actual payroll\\motorPH_payroll\\OOP-MotorPH-main\\motorPHpayrollsystem\\src\\main\\java\\CSV\\AttendanceRecords";
-    public static final String LEAVES_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\actual payroll\\motorPH_payroll\\OOP-MotorPH-main\\motorPHpayrollsystem\\src\\main\\java\\CSV\\Leaves.csv";
+    public static final String EMPLOYEE_CSV = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "CSV" + File.separator + "EmpData.csv";
+    private static final String ADMIN_CSV = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "CSV" + File.separator + "AdminLogin.csv";
+    public static final String HR_CSV = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "CSV" + File.separator + "HRLogin.csv";
+    private static final String FINANCE_CSV = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "CSV" + File.separator + "FinanceLogin.csv";
+    public static final String ATTENDANCE_CSV = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "CSV" + File.separator + "AttendanceRecords";
+    public static final String LEAVES_CSV = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "CSV" + File.separator + "Leaves.csv";
     
     public SystemIT(String email, String password, String role) {
         super(email, password, role);

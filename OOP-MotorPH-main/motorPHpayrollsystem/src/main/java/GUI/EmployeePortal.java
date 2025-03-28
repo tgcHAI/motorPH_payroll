@@ -549,9 +549,8 @@ public class EmployeePortal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void requestLeaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_requestLeaveButtonActionPerformed
-        LeaveReqPortal frame = new LeaveReqPortal();
-        frame.setVisible(true);
-        dispose();
+         LeaveReqPortal leaveWindow = new LeaveReqPortal(); 
+         leaveWindow.setVisible(true);
     }//GEN-LAST:event_requestLeaveButtonActionPerformed
 
     private void viewPayslipButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewPayslipButtonActionPerformed
