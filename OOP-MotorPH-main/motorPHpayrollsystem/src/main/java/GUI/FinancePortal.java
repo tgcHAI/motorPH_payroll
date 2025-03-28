@@ -483,7 +483,14 @@ public class FinancePortal extends javax.swing.JFrame {
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void calculateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateButtonActionPerformed
-          //Open payslip, read the ID and load information into the things  
+          String employeeID = employeeIDField.getText().trim();
+    if (employeeID.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter an Employee ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    PayslipPopup payslip = new PayslipPopup(employeeID);
+    payslip.setVisible(true);
     }//GEN-LAST:event_calculateButtonActionPerformed
 
     private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed

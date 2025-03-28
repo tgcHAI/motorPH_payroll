@@ -1,12 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package GUI;
 import OOP.Finance;
+import OOP.SystemIT;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-public class PayslipPopup extends javax.swing.JFrame {
+public final class PayslipPopup extends javax.swing.JFrame {
     
     /**
      * Creates new form PayslipPopup
@@ -17,10 +19,11 @@ public class PayslipPopup extends javax.swing.JFrame {
         initComponents();
         this.employeeID = employeeID;
         empNumDisplay.setText(employeeID);
+        populatePayslipFields();
     }
-    
-    public PayslipPopup() {
-        initComponents();
+
+    private PayslipPopup() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     /**
@@ -66,6 +69,7 @@ public class PayslipPopup extends javax.swing.JFrame {
         totalPayout = new javax.swing.JLabel();
         welcomeBack5 = new javax.swing.JLabel();
         welcomeBack2 = new javax.swing.JLabel();
+        calculateButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -73,7 +77,6 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel2.setText("ID:");
 
-        empNumDisplay.setText("placeholder #");
         empNumDisplay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empNumDisplayActionPerformed(evt);
@@ -82,7 +85,6 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel3.setText("Name:");
 
-        empNumDisplay1.setText("placeholder name");
         empNumDisplay1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empNumDisplay1ActionPerformed(evt);
@@ -124,7 +126,7 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel4.setText("Pag-IBIG:");
 
-        empIbigNum.setText("pagIBIG #");
+        empIbigNum.setEditable(false);
         empIbigNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empIbigNumActionPerformed(evt);
@@ -133,14 +135,14 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel5.setText("SSS:");
 
-        empSSSNum.setText("SSS #");
+        empSSSNum.setEditable(false);
         empSSSNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empSSSNumActionPerformed(evt);
             }
         });
 
-        empTINNum.setText("TIN #");
+        empTINNum.setEditable(false);
         empTINNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empTINNumActionPerformed(evt);
@@ -151,7 +153,7 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel7.setText("PhilHealth:");
 
-        empPhilHealthNum.setText("PhilHealth #");
+        empPhilHealthNum.setEditable(false);
         empPhilHealthNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empPhilHealthNumActionPerformed(evt);
@@ -216,28 +218,24 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel10.setText("Phone Allowance:");
 
-        empRiceSubsidyNum.setText("ricesibsidy #");
         empRiceSubsidyNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empRiceSubsidyNumActionPerformed(evt);
             }
         });
 
-        empBasicSalaryNum.setText("basicsalary #");
         empBasicSalaryNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empBasicSalaryNumActionPerformed(evt);
             }
         });
 
-        empClothingAllowanceNum.setText("clothing #");
         empClothingAllowanceNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empClothingAllowanceNumActionPerformed(evt);
             }
         });
 
-        empPhoneAllowanceNum.setText("phoneallowance #");
         empPhoneAllowanceNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empPhoneAllowanceNumActionPerformed(evt);
@@ -250,7 +248,6 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel9.setText("Rice Subsidy: ");
 
-        empSemiMonthlyNum.setText("PhilHealth #");
         empSemiMonthlyNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empSemiMonthlyNumActionPerformed(evt);
@@ -259,7 +256,6 @@ public class PayslipPopup extends javax.swing.JFrame {
 
         jLabel12.setText("Semi-Monthly Rate:");
 
-        empHourlyRateNum.setText("hourlyrate #");
         empHourlyRateNum.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 empHourlyRateNumActionPerformed(evt);
@@ -337,7 +333,7 @@ public class PayslipPopup extends javax.swing.JFrame {
         );
 
         totalPayout.setBackground(new java.awt.Color(255, 255, 255));
-        totalPayout.setFont(new java.awt.Font("Segoe UI Black", 0, 24)); // NOI18N
+        totalPayout.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         totalPayout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         totalPayout.setText("Payout #");
 
@@ -373,6 +369,13 @@ public class PayslipPopup extends javax.swing.JFrame {
         welcomeBack2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         welcomeBack2.setText("Employee's Payslip");
 
+        calculateButton.setText("Pay me.");
+        calculateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                calculateButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -383,21 +386,24 @@ public class PayslipPopup extends javax.swing.JFrame {
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(welcomeBack2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(14, 14, 14)
-                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(14, 14, 14)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(welcomeBack2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(calculateButton)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(welcomeBack2)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(welcomeBack2)
+                    .addComponent(calculateButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -427,6 +433,88 @@ public class PayslipPopup extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private String[] getEmployeeData(String employeeID) {
+    String csvFile = SystemIT.EMPLOYEE_CSV;
+    String line;
+    String splitBy = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
+    try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+        // Read header
+        br.readLine();
+        while ((line = br.readLine()) != null) {
+            String[] data = line.split(splitBy);
+            //debug1
+            System.out.println("Raw Data: " + Arrays.toString(data));
+            if (data.length >= 19 && data[0].trim().equals(employeeID)) {
+                for (int i = 0; i < data.length; i++) {
+                    data[i] = data[i].replaceAll("^\"|\"$", "").trim();
+                }
+                //debug 2
+                System.out.println("Cleaned Data: " + Arrays.toString(data));
+                
+                return data;
+            }
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+// Method to populate the fields in PayslipPopup
+public void populatePayslipFields() {
+    String[] row = getEmployeeData(employeeID);
+    if (row == null) {
+        JOptionPane.showMessageDialog(this, "Employee data not found for ID: " + employeeID, "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    empIbigNum.setText(row[6].trim());          
+    empSSSNum.setText(row[3].trim());             
+    empTINNum.setText(row[5].trim());            
+    empPhilHealthNum.setText(row[4].trim());     
+    empBasicSalaryNum.setText(row[13].trim());      
+    empRiceSubsidyNum.setText(row[14].trim());      
+    empPhoneAllowanceNum.setText(row[15].trim());   
+    empClothingAllowanceNum.setText(row[16].trim());  
+    empSemiMonthlyNum.setText(row[17].trim());      
+    empHourlyRateNum.setText(row[18].trim());       
+}
+public void computePayroll() {
+    try {
+        // Remove quotes and commas from all input fields
+        String basicSalaryStr = empBasicSalaryNum.getText().trim().replaceAll("[\"']", "").replace(",", "");
+        String riceSubsidyStr = empRiceSubsidyNum.getText().trim().replaceAll("[\"']", "").replace(",", "");
+        String phoneAllowanceStr = empPhoneAllowanceNum.getText().trim().replaceAll("[\"']", "").replace(",", "");
+        String clothingAllowanceStr = empClothingAllowanceNum.getText().trim().replaceAll("[\"']", "").replace(",", "");
+
+        // Check if any field is still empty after trimming
+        if (basicSalaryStr.isEmpty() || riceSubsidyStr.isEmpty() || phoneAllowanceStr.isEmpty() || clothingAllowanceStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "One or more fields are empty! Please fill in all fields.", 
+                                          "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;  
+        }
+
+        // Parse cleaned strings into numbers
+        double basicSalary = Double.parseDouble(basicSalaryStr);
+        double riceSubsidy = Double.parseDouble(riceSubsidyStr);
+        double phoneAllowance = Double.parseDouble(phoneAllowanceStr);
+        double clothingAllowance = Double.parseDouble(clothingAllowanceStr);
+
+        // Compute total allowances
+        double totalAllowances = riceSubsidy + phoneAllowance + clothingAllowance;
+
+        // Apply a flat 5% deduction on the total salary (basic salary + allowances)
+        double grossSalary = basicSalary + totalAllowances;
+        double totalDeductions = grossSalary * 0.05;
+        double netPay = grossSalary - totalDeductions;
+
+        // Display result
+        totalPayout.setText(String.format("₱%.2f", netPay));
+
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid number format! Ensure all fields contain valid numeric values.", 
+                                      "Input Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
     private void empNumDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empNumDisplayActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_empNumDisplayActionPerformed
@@ -475,6 +563,10 @@ public class PayslipPopup extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_empHourlyRateNumActionPerformed
 
+    private void calculateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateButtonActionPerformed
+        computePayroll();
+    }//GEN-LAST:event_calculateButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -511,6 +603,7 @@ public class PayslipPopup extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton calculateButton;
     private javax.swing.JTextField empBasicSalaryNum;
     private javax.swing.JTextField empClothingAllowanceNum;
     private javax.swing.JTextField empHourlyRateNum;

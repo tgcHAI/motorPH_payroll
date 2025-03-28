@@ -555,13 +555,9 @@ public class EmployeePortal extends javax.swing.JFrame {
     }//GEN-LAST:event_requestLeaveButtonActionPerformed
 
     private void viewPayslipButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewPayslipButtonActionPerformed
-        // TODO add your handling code here:
-        String employeeID = empNumField.getText().trim();
-        
-        PayslipPopup popup = new PayslipPopup(employeeID);
-        popup.setVisible(true);
-        dispose();
-        
+    String employeeID = empNumField.getText().trim();
+    PayslipPopup popup = new PayslipPopup(employeeID);
+    popup.setVisible(true);
     }//GEN-LAST:event_viewPayslipButtonActionPerformed
 
     private void LogOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogOutButtonActionPerformed

@@ -12,6 +12,20 @@
         <exec.mainClass>com.mycompany.motorphpayrollsystem.MotorPHpayrollsystem</exec.mainClass>
     </properties>
     <name>AA_motorPH_payroll_system</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <repositories>
         <repository>
             <id>unknown-jars-temp-repo</id>
