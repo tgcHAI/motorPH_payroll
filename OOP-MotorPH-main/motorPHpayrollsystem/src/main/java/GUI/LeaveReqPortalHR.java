@@ -5,6 +5,11 @@
 package GUI;
 
 import OOP.HR;
+import OOP.SystemIT;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -17,6 +22,7 @@ public class LeaveReqPortalHR extends javax.swing.JFrame {
      */
     public LeaveReqPortalHR() {
         initComponents();
+        loadLeaveRequests();
     }
 
     /**
@@ -39,19 +45,20 @@ public class LeaveReqPortalHR extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel2.setForeground(new java.awt.Color(0, 0, 0));
 
         leaveTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
                 "Employee Number", "Leave Type", "Start Date", "End Date", "Status"
             }
         ));
+        leaveTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                leaveTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(leaveTable);
 
         goBack.setText("Go Back");
@@ -100,7 +107,7 @@ public class LeaveReqPortalHR extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(welcomeBack1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(11, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -139,12 +146,10 @@ public class LeaveReqPortalHR extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void goBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goBackActionPerformed
-        
+
         HRPortal hr = new HRPortal();
         hr.setVisible(true);
         dispose();
-        
-        
     }//GEN-LAST:event_goBackActionPerformed
 
     private void rejectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rejectButtonActionPerformed
@@ -159,6 +164,10 @@ public class LeaveReqPortalHR extends javax.swing.JFrame {
             HR request = new HR("", "");
             request.approveLeave("");
     }//GEN-LAST:event_acceptButtonActionPerformed
+
+    private void leaveTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_leaveTableMouseClicked
+       //click click
+    }//GEN-LAST:event_leaveTableMouseClicked
 
     /**
      * @param args the command line arguments
@@ -201,7 +210,25 @@ public class LeaveReqPortalHR extends javax.swing.JFrame {
             }
         });
     }
-
+    
+    private void loadLeaveRequests() {
+    DefaultTableModel model = (DefaultTableModel) leaveTable.getModel();
+    model.setRowCount(0);
+    String csvFile = SystemIT.LEAVES_CSV;
+    try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+        br.readLine(); // skip header
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] data = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            if (data.length >= 5)
+                model.addRow(new Object[]{data[0].trim(), data[3].trim(), data[1].trim(), data[2].trim(), data[4].trim()});
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton acceptButton;
     private javax.swing.JButton goBack;

@@ -4,7 +4,12 @@
  */
 package GUI;
 
+import OOP.SystemIT;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -17,6 +22,7 @@ public class LeaveReqPortal extends javax.swing.JFrame {
      */
     public LeaveReqPortal() {
         initComponents();
+        loadLeaveRequests();
     }
 
     /**
@@ -194,10 +200,7 @@ public class LeaveReqPortal extends javax.swing.JFrame {
 
         leaveTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Leave Type", "Start Date", "End Date", "Status"
@@ -213,7 +216,6 @@ public class LeaveReqPortal extends javax.swing.JFrame {
         });
 
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel2.setForeground(new java.awt.Color(0, 0, 0));
 
         welcomeBack1.setBackground(new java.awt.Color(255, 255, 255));
         welcomeBack1.setFont(new java.awt.Font("Segoe UI Black", 0, 24)); // NOI18N
@@ -290,6 +292,23 @@ public class LeaveReqPortal extends javax.swing.JFrame {
         
     }//GEN-LAST:event_goBackActionPerformed
 
+    private void loadLeaveRequests() {
+    DefaultTableModel model = (DefaultTableModel) leaveTable.getModel();
+    model.setRowCount(0);
+    String csvFile = SystemIT.LEAVES_CSV;
+    try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+        br.readLine(); // skip header
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] data = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            if (data.length >= 5)
+                model.addRow(new Object[]{data[0].trim(), data[3].trim(), data[1].trim(), data[2].trim(), data[4].trim()});
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+    
     /**
      * @param args the command line arguments
      */
@@ -346,7 +365,6 @@ public class LeaveReqPortal extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable leaveTable;
     private javax.swing.JPanel line;
-    private javax.swing.JPanel line1;
     private javax.swing.JTextField notes;
     private javax.swing.JButton requestLeave;
     private javax.swing.JTextField startDay;
