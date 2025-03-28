@@ -9,7 +9,8 @@ public class SystemIT extends User {
     private static final String ADMIN_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\OOP-MotorPH\\OOP-MotorPH-main\\OOP-MotorPH\\src\\main\\java\\CSV\\AdminLogin.csv";
     public static final String HR_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\OOP-MotorPH\\OOP-MotorPH-main\\OOP-MotorPH\\src\\main\\java\\CSV\\HRLogin.csv";
     private static final String FINANCE_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\OOP-MotorPH\\OOP-MotorPH-main\\OOP-MotorPH\\src\\main\\java\\CSV\\FinanceLogin.csv";
-
+    public static final String ATTENDANCE_CSV = "C:\\Users\\Fen\\Documents\\GitHub\\actual payroll\\motorPH_payroll\\OOP-MotorPH-main\\motorPHpayrollsystem\\src\\main\\java\\CSV\\AttendanceRecords";
+    
     public SystemIT(String email, String password, String role) {
         super(email, password, role);
     }
