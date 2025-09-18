@@ -10,6 +10,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <exec.mainClass>com.mycompany.motorphpayrollsystem.MotorPHpayrollsystem</exec.mainClass>
+        <sonar.organization>zephyrstorm123</sonar.organization>
     </properties>
     <name>AA_motorPH_payroll_system</name>
     <build>
