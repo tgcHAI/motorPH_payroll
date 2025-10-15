@@ -33,25 +33,33 @@ public class SystemIT extends User {
         }
     }
 
+    //BCrypt hashing
     private static boolean checkCredentials(String filePath, String email, String password) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            boolean isFirstLine = true;
-            while ((line = br.readLine()) != null) {
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    continue;
-                }
-                String[] values = line.split(",");
-                if (values.length > 1 && values[0].trim().equals(email) && values[1].trim().equals(password)) {
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        String line;
+        boolean isFirstLine = true;
+        while ((line = br.readLine()) != null) {
+            if (isFirstLine) {
+                isFirstLine = false;
+                continue;
+            }
+
+            String[] values = line.split(",");
+            if (values.length > 1 && values[0].trim().equals(email)) {
+                String storedPassword = values[1].trim();
+
+                // ✅ Allow both hashed & plaintext logins
+                if (HashUtil.checkPassword(password, storedPassword) || password.equals(storedPassword)) {
                     return true;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return false;
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+    return false;
+}
+
 
     private static Employee getEmployeeDetails(String email, String password) {
         try (BufferedReader br = new BufferedReader(new FileReader(EMPLOYEE_CSV))) {
@@ -75,24 +83,30 @@ public class SystemIT extends User {
                 }
 
                 // Ensure we have at least 21 columns before accessing indices
-                if (values.length >= 21 && values[19].equals(email) && values[20].equals(password)) {
-                    try {
-                        return new Employee(
-                            values[19], values[20],  // Email & Password
-                            values[0], values[1], values[2],  // Employee Number, Last Name, First Name
-                            values[7], values[10],   // Birthday, Status
-                            values[9], values[8],    // Phone Number, Address
-                            parseDoubleSafe(values[13]),  // Basic Salary
-                            parseDoubleSafe(values[18]),  // Hourly Rate
-                            parseDoubleSafe(values[14]),  // Rice Subsidy
-                            parseDoubleSafe(values[15]),  // Phone Allowance
-                            parseDoubleSafe(values[16]),  // Clothing Allowance
-                            values[3], values[6], values[4], values[5] // SSS, Pag-IBIG, PhilHealth, TIN Number
-                        );
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error parsing numeric values at line " + lineNumber + ": " + e.getMessage());
+                if (values.length >= 21 && values[19].equals(email)) {
+                    String storedPassword = values[20].trim();
+
+                    // Check hashed OR plaintext password (for backward compatibility)
+                    if (HashUtil.checkPassword(password, storedPassword) || password.equals(storedPassword)) {
+                        try {
+                            return new Employee(
+                                values[19], values[20],  // Email & Password
+                                values[0], values[1], values[2],  // Employee Number, Last Name, First Name
+                                values[7], values[10],   // Birthday, Status
+                                values[9], values[8],    // Phone Number, Address
+                                parseDoubleSafe(values[13]),  // Basic Salary
+                                parseDoubleSafe(values[18]),  // Hourly Rate
+                                parseDoubleSafe(values[14]),  // Rice Subsidy
+                                parseDoubleSafe(values[15]),  // Phone Allowance
+                                parseDoubleSafe(values[16]),  // Clothing Allowance
+                                values[3], values[6], values[4], values[5] // SSS, Pag-IBIG, PhilHealth, TIN Number
+                            );
+                        } catch (NumberFormatException e) {
+                            System.err.println("Error parsing numeric values at line " + lineNumber + ": " + e.getMessage());
+                        }
                     }
                 }
+
             }
         } catch (IOException e) {
             System.err.println("Error reading CSV file: " + e.getMessage());

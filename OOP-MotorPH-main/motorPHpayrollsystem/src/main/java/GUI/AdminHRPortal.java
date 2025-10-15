@@ -674,25 +674,47 @@ public class AdminHRPortal extends javax.swing.JFrame {
     }//GEN-LAST:event_backtoAdminActionPerformed
 
     private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-    // Get the table model
-        DefaultTableModel model = (DefaultTableModel) updateTable.getModel();
+    // Validate that at least employee number and name are filled
+    if (empNum.getText().trim().isEmpty() || 
+        lastName.getText().trim().isEmpty() || 
+        firstName.getText().trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill in Employee Number, Last Name, and First Name.", "Incomplete Data", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    String[] newRow = {
+        empNum.getText().trim(),
+        lastName.getText().trim(),
+        firstName.getText().trim(),
+        sss.getText().trim(),
+        philHealth.getText().trim(),
+        tin.getText().trim(),
+        pagIBIG.getText().trim(),
+        birthday.getText().trim(),
+        address.getText().trim(),
+        phoneNum.getText().trim(),
+        status.getText().trim(),
+        position.getText().trim(),
+        immediateSupervisor.getText().trim(),
+        basicSalary.getText().trim(),
+        riceSub.getText().trim(),
+        phoneAllowance.getText().trim(),
+        clothingAllowance.getText().trim(),
+        monthlyRate.getText().trim(),
+        hourlyRate.getText().trim(),
+        "", // Email
+        ""  // Password
+    };
 
-        // Get the number of columns in the table
-        int columnCount = model.getColumnCount();
-        // Create an array to hold the empty row data
-        Object[] emptyRow = new Object[columnCount];
+    DefaultTableModel model = (DefaultTableModel) updateTable.getModel();
+    model.addRow(newRow);
 
-        // Add the empty row to the table model
-        model.addRow(emptyRow);
+    // Use ONE consistent method to save
+    saveDataToCSV(model, SystemIT.EMPLOYEE_CSV);
 
-        // Save the updated table data to the CSV file
-        saveDataToCSV(model, SystemIT.EMPLOYEE_CSV);
-
-        // Show a message indicating that the row was added successfully
-        JOptionPane.showMessageDialog(this, "Row added successfully!", "Add Row", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(this, "Employee record added successfully!", "Add Row", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // ✅ Method to save the table data to the CSV file
+    //redone. now uses hashing.
     private void saveDataToCSV(TableModel model, String csvFilePath) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
             // Write the column headers to the CSV file
@@ -703,24 +725,32 @@ public class AdminHRPortal extends javax.swing.JFrame {
                 }
             }
             bw.newLine();
-
             // Write the table data to the CSV file
             for (int i = 0; i < model.getRowCount(); i++) {
                 for (int j = 0; j < model.getColumnCount(); j++) {
                     Object value = model.getValueAt(i, j);
-                    bw.write(value != null ? value.toString() : "");
+                    String text = (value != null) ? value.toString() : "";
+
+                    //If this is the password column, hash before writing
+                    if (j == 20 && !text.isEmpty() && !text.startsWith("$2a$")) { 
+                        // Avoid double-hashing already hashed passwords
+                        text = OOP.HashUtil.hashPassword(text);
+                    }
+
+                    bw.write(text);
                     if (j < model.getColumnCount() - 1) {
                         bw.write(",");
                     }
                 }
                 bw.newLine();
             }
+
+            JOptionPane.showMessageDialog(this, "Data saved securely to CSV.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
         } catch (IOException e) {
             e.printStackTrace();
-            // Show an error message if saving the data to the CSV file fails
-            JOptionPane.showMessageDialog(this, "Failed to save data to CSV file!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Failed to save data to CSV!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
     }//GEN-LAST:event_createButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
@@ -739,18 +769,20 @@ public class AdminHRPortal extends javax.swing.JFrame {
                 model.removeRow(selectedRow);
 
                 // Save the updated table data to the CSV file
-                saveTableDataToCSV(model, SystemIT.EMPLOYEE_CSV);
+                saveDataToCSV(model, SystemIT.EMPLOYEE_CSV);
 
                 // Show a success message
                 JOptionPane.showMessageDialog(this, "Row deleted successfully!", "Delete Row", JOptionPane.INFORMATION_MESSAGE);
-            }
+            }   
         }
     }
 
-    // ✅ Method to save the table data to CSV
-    private void saveTableDataToCSV(TableModel model, String csvFilePath) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
-            // Write the column headers
+    //Method to save the table data to CSV 
+    //removed as it is doing too much and conflicting with other functions, I can't seems to remove it as well
+    /*
+    private void saveTableDataToCSV(TableModel model, String csvFilePath) 
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
+            // Write the column headers to the CSV file
             for (int j = 0; j < model.getColumnCount(); j++) {
                 bw.write(model.getColumnName(j));
                 if (j < model.getColumnCount() - 1) {
@@ -759,25 +791,34 @@ public class AdminHRPortal extends javax.swing.JFrame {
             }
             bw.newLine();
 
-            // Write data rows
+            // Write the table data to the CSV file
             for (int i = 0; i < model.getRowCount(); i++) {
                 for (int j = 0; j < model.getColumnCount(); j++) {
                     Object value = model.getValueAt(i, j);
-                    bw.write(value != null ? value.toString() : "");
+                    String text = (value != null) ? value.toString() : "";
+
+                    //If this is the password column, hash before writing
+                    if (j == 20 && !text.isEmpty() && !text.startsWith("$2a$")) { 
+                        // Avoid double-hashing already hashed passwords
+                        text = OOP.HashUtil.hashPassword(text);
+                    }
+
+                    bw.write(text);
                     if (j < model.getColumnCount() - 1) {
                         bw.write(",");
                     }
                 }
                 bw.newLine();
             }
+
+            JOptionPane.showMessageDialog(this, "Data saved securely to CSV.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to save data to CSV file!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Failed to save data to CSV!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
-        
     }//GEN-LAST:event_deleteButtonActionPerformed
-
+*/
     private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
 
         DefaultTableModel tableModel = (DefaultTableModel) updateTable.getModel(); 
