@@ -109,9 +109,16 @@ public class AdminHRPortal extends javax.swing.JFrame {
                 "#", "Last Name", "First Name", "SSS #", "PhilHealth #", "TIN #", "Pag IBIG #", "Birthday", "Address", "Phone Number", "Status", "Position", "Immediate Supervisor", "Basic Salary", "Rice Subsidy", "Phone Allowance", "Clothing Allowance", "Gross Semi-Monthly Rate", "Hourly Rate", "Email", "Password"
             }
         ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -157,12 +164,6 @@ public class AdminHRPortal extends javax.swing.JFrame {
             updateTable.getColumnModel().getColumn(17).setMinWidth(0);
             updateTable.getColumnModel().getColumn(17).setPreferredWidth(0);
             updateTable.getColumnModel().getColumn(17).setMaxWidth(0);
-            updateTable.getColumnModel().getColumn(19).setMinWidth(0);
-            updateTable.getColumnModel().getColumn(19).setPreferredWidth(0);
-            updateTable.getColumnModel().getColumn(19).setMaxWidth(0);
-            updateTable.getColumnModel().getColumn(20).setMinWidth(0);
-            updateTable.getColumnModel().getColumn(20).setPreferredWidth(0);
-            updateTable.getColumnModel().getColumn(20).setMaxWidth(0);
         }
 
         jSeparator1.setBackground(new java.awt.Color(0, 51, 102));
@@ -271,7 +272,6 @@ public class AdminHRPortal extends javax.swing.JFrame {
 
         updateButton.setBackground(new java.awt.Color(255, 255, 255));
         updateButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        updateButton.setForeground(new java.awt.Color(0, 0, 0));
         updateButton.setText("Update");
         updateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -324,12 +324,10 @@ public class AdminHRPortal extends javax.swing.JFrame {
 
         jLabel22.setBackground(new java.awt.Color(0, 0, 0));
         jLabel22.setFont(new java.awt.Font("Calisto MT", 1, 8)); // NOI18N
-        jLabel22.setForeground(new java.awt.Color(0, 0, 0));
         jLabel22.setText("aaaa");
 
         jLabel23.setBackground(new java.awt.Color(0, 0, 0));
         jLabel23.setFont(new java.awt.Font("Calisto MT", 1, 8)); // NOI18N
-        jLabel23.setForeground(new java.awt.Color(0, 0, 0));
         jLabel23.setText("aaaa");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -461,11 +459,11 @@ public class AdminHRPortal extends javax.swing.JFrame {
                                 .addGap(211, 211, 211))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
+                            .addComponent(jSeparator1)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 1269, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jSeparator1))
+                                .addGap(0, 41, Short.MAX_VALUE))
+                            .addComponent(jScrollPane1))
                         .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
@@ -577,7 +575,6 @@ public class AdminHRPortal extends javax.swing.JFrame {
         );
 
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel2.setForeground(new java.awt.Color(0, 0, 0));
 
         jLabel24.setFont(new java.awt.Font("Times New Roman", 1, 36)); // NOI18N
         jLabel24.setForeground(new java.awt.Color(255, 255, 255));
@@ -715,42 +712,54 @@ public class AdminHRPortal extends javax.swing.JFrame {
     }
 
     //redone. now uses hashing.
-    private void saveDataToCSV(TableModel model, String csvFilePath) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
-            // Write the column headers to the CSV file
-            for (int j = 0; j < model.getColumnCount(); j++) {
-                bw.write(model.getColumnName(j));
-                if (j < model.getColumnCount() - 1) {
-                    bw.write(",");
-                }
-            }
-            bw.newLine();
-            // Write the table data to the CSV file
-            for (int i = 0; i < model.getRowCount(); i++) {
-                for (int j = 0; j < model.getColumnCount(); j++) {
-                    Object value = model.getValueAt(i, j);
-                    String text = (value != null) ? value.toString() : "";
+    private void saveDataToCSV(TableModel model, String csvFilePath) 
+    {
+     try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFilePath))) {
 
-                    //If this is the password column, hash before writing
-                    if (j == 20 && !text.isEmpty() && !text.startsWith("$2a$")) { 
-                        // Avoid double-hashing already hashed passwords
-                        text = OOP.HashUtil.hashPassword(text);
-                    }
-
-                    bw.write(text);
-                    if (j < model.getColumnCount() - 1) {
-                        bw.write(",");
-                    }
-                }
-                bw.newLine();
-            }
-
-            JOptionPane.showMessageDialog(this, "Data saved securely to CSV.", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to save data to CSV!", "Error", JOptionPane.ERROR_MESSAGE);
+        // Write column headers
+        for (int j = 0; j < model.getColumnCount(); j++) {
+        String header = model.getColumnName(j);
+        if (header.contains(",") || header.contains("\"")) {
+        header = "\"" + header.replace("\"", "\"\"") + "\"";
         }
+        bw.write(header);
+        if (j < model.getColumnCount() - 1) bw.write(",");
+        }
+        bw.newLine();
+        // Write data rows
+        for (int i = 0; i < model.getRowCount(); i++) {
+        for (int j = 0; j < model.getColumnCount(); j++) {
+        Object value = model.getValueAt(i, j);
+        // Handle password column (last column)
+        if (j == model.getColumnCount() - 1 && value != null && !value.toString().isEmpty()) {
+        String pwd = value.toString();
+        // Prevent empty or invalid passwords
+        if (pwd.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Password cannot be blank for row " + (i + 1),
+        "Error", JOptionPane.WARNING_MESSAGE);
+        continue;
+        }
+        //hash if not hashed
+        if (!(pwd.startsWith("$2a$") || pwd.startsWith("$2b$") || pwd.startsWith("$2y$"))) {
+        String hashedPassword = OOP.HashUtil.hashPassword(pwd);
+        ((DefaultTableModel) model).setValueAt(hashedPassword, i, j);
+        value = hashedPassword;}
+            }
+        // Escape cell value
+                String cell = (value != null) ? value.toString() : "";
+        if (cell.contains(",") || cell.contains("\"") || cell.contains("\n")) {
+        cell = "\"" + cell.replace("\"", "\"\"") + "\"";
+        }
+        bw.write(cell);
+        if (j < model.getColumnCount() - 1) bw.write(",");
+        }
+        bw.newLine();
+        }
+        } catch (IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Failed to save data to CSV file!",
+                "Error", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_createButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed

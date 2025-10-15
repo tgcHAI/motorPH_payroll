@@ -223,12 +223,12 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jSeparator2" min="-2" pref="1269" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
                               <Component id="jSeparator1" alignment="0" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="jSeparator2" min="-2" pref="1269" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="41" max="32767" attributes="0"/>
+                              </Group>
+                              <Component id="jScrollPane1" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -407,8 +407,8 @@
                     <Column editable="false" title="Clothing Allowance" type="java.lang.Object"/>
                     <Column editable="true" title="Gross Semi-Monthly Rate" type="java.lang.Object"/>
                     <Column editable="true" title="Hourly Rate" type="java.lang.Object"/>
-                    <Column editable="false" title="Email" type="java.lang.Object"/>
-                    <Column editable="false" title="Password" type="java.lang.Object"/>
+                    <Column editable="true" title="Email" type="java.lang.String"/>
+                    <Column editable="true" title="Password" type="java.lang.String"/>
                   </Table>
                 </Property>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -508,12 +508,12 @@
                       <Editor/>
                       <Renderer/>
                     </Column>
-                    <Column maxWidth="0" minWidth="0" prefWidth="0" resizable="true">
+                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                       <Title/>
                       <Editor/>
                       <Renderer/>
                     </Column>
-                    <Column maxWidth="0" minWidth="0" prefWidth="0" resizable="true">
+                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                       <Title/>
                       <Editor/>
                       <Renderer/>

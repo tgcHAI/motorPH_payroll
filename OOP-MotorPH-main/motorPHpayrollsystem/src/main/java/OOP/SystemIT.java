@@ -43,13 +43,11 @@ public class SystemIT extends User {
                 isFirstLine = false;
                 continue;
             }
-
             String[] values = line.split(",");
             if (values.length > 1 && values[0].trim().equals(email)) {
                 String storedPassword = values[1].trim();
-
-                // ✅ Allow both hashed & plaintext logins
-                if (HashUtil.checkPassword(password, storedPassword) || password.equals(storedPassword)) {
+                // Use HashUtil to verify the password
+                if (OOP.HashUtil.checkPassword(password, storedPassword)) {
                     return true;
                 }
             }
