@@ -39,5 +39,12 @@
             <artifactId>AbsoluteLayout</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
+    <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+      <type>jar</type>
+    </dependency>
     </dependencies>
+    
 </project>

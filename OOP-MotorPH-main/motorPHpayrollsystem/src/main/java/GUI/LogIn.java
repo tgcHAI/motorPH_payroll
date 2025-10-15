@@ -85,6 +85,12 @@ public class LogIn extends javax.swing.JFrame{
         credentials1.setForeground(new java.awt.Color(255, 255, 255));
         credentials1.setText("Password:");
 
+        emailField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailFieldActionPerformed(evt);
+            }
+        });
+
         viewPassword.setFont(new java.awt.Font("Calibri", 0, 10)); // NOI18N
         viewPassword.setForeground(new java.awt.Color(255, 255, 255));
         viewPassword.setText("View Password");
@@ -351,6 +357,10 @@ public class LogIn extends javax.swing.JFrame{
         SystemIT.validateLogin(email, password, this);
     
     }//GEN-LAST:event_LogInButtonActionPerformed
+
+    private void emailFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_emailFieldActionPerformed
 
     /**
      * @param args the command line arguments
