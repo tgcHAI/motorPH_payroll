@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import OOP.SessionTimeoutManager;
 
 /**
  *
@@ -27,8 +28,26 @@ public class AdminHRPortal extends javax.swing.JFrame {
      */
     public AdminHRPortal() {
         initComponents();
+        
+        //Call timeout
+        SessionTimeoutManager.start(this, () -> {
+        // This runs on Swing EDT — safe to show dialogs and dispose
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Session timed out due to inactivity.",
+                "Session Expired",
+                javax.swing.JOptionPane.WARNING_MESSAGE
+            );
+            new GUI.LogIn().setVisible(true); // Assuming Login is in GUI package
+            this.dispose();
+        });
     }
-
+        @Override
+    public void dispose() {
+        SessionTimeoutManager.stop(); // Explicit cleanup
+        super.dispose();
+        }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

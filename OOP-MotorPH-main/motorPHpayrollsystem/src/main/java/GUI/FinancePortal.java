@@ -7,6 +7,7 @@ package GUI;
 import OOP.Finance;
 import OOP.HR;
 import OOP.SystemIT;
+import OOP.SessionTimeoutManager;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,7 +27,25 @@ public class FinancePortal extends javax.swing.JFrame {
      */
     public FinancePortal() {
         initComponents();
+        
+        //Call timeout
+        SessionTimeoutManager.start(this, () -> {
+        // This runs on Swing EDT — safe to show dialogs and dispose
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Session timed out due to inactivity.",
+                "Session Expired",
+                javax.swing.JOptionPane.WARNING_MESSAGE
+            );
+            new GUI.LogIn().setVisible(true); // Assuming Login is in GUI package
+            this.dispose();
+        });
     }
+        @Override
+    public void dispose() {
+        SessionTimeoutManager.stop(); // Explicit cleanup
+        super.dispose();
+        }
 
     /**
      * This method is called from within the constructor to initialize the form.

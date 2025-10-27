@@ -1,6 +1,7 @@
 package GUI;
 
 import OOP.Employee;
+import OOP.SessionTimeoutManager;
 import javax.swing.JFrame;
 import javax.swing.table.TableModel;
 
@@ -10,6 +11,25 @@ public class ViewPortal extends javax.swing.JFrame {
     
     public ViewPortal() {
         initComponents();
+        
+                        //Call timeout
+        SessionTimeoutManager.start(this, () -> {
+        // This runs on Swing EDT — safe to show dialogs and dispose
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Session timed out due to inactivity.",
+                "Session Expired",
+                javax.swing.JOptionPane.WARNING_MESSAGE
+            );
+            new GUI.LogIn().setVisible(true); // Assuming Login is in GUI package
+            this.dispose();
+        });
+    }
+        @Override
+    public void dispose() {
+        SessionTimeoutManager.stop(); // Explicit cleanup
+        super.dispose();
+        
     }
 
     @SuppressWarnings("unchecked")
