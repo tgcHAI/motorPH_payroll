@@ -107,6 +107,7 @@ public class SystemIT extends User {
             System.err.println("Error reading employee data from file: " + e.getMessage());
             e.printStackTrace();
         }
+        return "";
     }
     
     public static String updateTotpSecret(String csvPath, String[] updateRow, String email, int lineCount, BufferedReader br) throws IOException {
