@@ -340,7 +340,7 @@ public class LogIn extends javax.swing.JFrame{
 
     private void LogInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogInButtonActionPerformed
           
-        String email = emailField.getText();
+        String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
 
         if (email.isEmpty() || password.isEmpty()) {
