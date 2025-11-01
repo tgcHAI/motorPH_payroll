@@ -12,7 +12,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.swing.JButton;
-
+import OOP.InputValidator;
+import OOP.ValidationRule;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -265,6 +268,11 @@ public class FinancePortal extends javax.swing.JFrame {
         });
 
         submitButton.setText("Save Edit");
+        submitButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                submitButtonActionPerformed(evt);
+            }
+        });
 
         refreshButton.setText("Regenerate Table");
         refreshButton.addActionListener(new java.awt.event.ActionListener() {
@@ -544,6 +552,33 @@ public class FinancePortal extends javax.swing.JFrame {
     sssField.setText(sss);
     philHealthField.setText(philHealth);
     }//GEN-LAST:event_empInfoTableMouseClicked
+
+    private void submitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitButtonActionPerformed
+        // TODO add your handling code here:
+        Map<javax.swing.JTextField, ValidationRule> rules = new HashMap<>();
+        //required information
+        rules.put(employeeIDField, ValidationRule.REQUIRED);
+        rules.put(employeeIDField, ValidationRule.EMPLOYEE_ID);
+        //Government ID.
+        rules.put(sssField, ValidationRule.SSS);
+        rules.put(philHealthField, ValidationRule.PHILHEALTH);
+        rules.put(pagIbigField, ValidationRule.PAGIBIG);
+        //Number requirements
+        rules.put(workingHoursField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(basicSalaryField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(taxIncomeField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(taxField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(totalDeductionField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(grossPayField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(netPayField, ValidationRule.DECIMAL_NON_NEGATIVE);
+
+        //Validation validatior 
+        String error = InputValidator.validate(rules);
+        if (error != null) {
+            JOptionPane.showMessageDialog(this, error, "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }//GEN-LAST:event_submitButtonActionPerformed
 
     /**
      * @param args the command line arguments

@@ -16,6 +16,10 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import OOP.SessionTimeoutManager;
+import OOP.InputValidator;
+import OOP.ValidationRule;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -28,7 +32,6 @@ public class AdminHRPortal extends javax.swing.JFrame {
      */
     public AdminHRPortal() {
         initComponents();
-        
         //Call timeout
         SessionTimeoutManager.start(this, () -> {
         // This runs on Swing EDT — safe to show dialogs and dispose
@@ -667,7 +670,39 @@ public class AdminHRPortal extends javax.swing.JFrame {
     }//GEN-LAST:event_updateTableMouseClicked
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-
+        Map<javax.swing.JTextField, ValidationRule> rules = new HashMap<>();
+        //REQUIRED fields
+        rules.put(empNum, ValidationRule.REQUIRED);
+        rules.put(lastName, ValidationRule.REQUIRED);
+        rules.put(firstName, ValidationRule.REQUIRED);
+        rules.put(position, ValidationRule.REQUIRED);
+        rules.put(status, ValidationRule.REQUIRED);
+        //Format Validation.
+        rules.put(empNum, ValidationRule.EMPLOYEE_ID);
+        rules.put(lastName, ValidationRule.NAME);
+        rules.put(firstName, ValidationRule.NAME);
+        rules.put(sss, ValidationRule.SSS);
+        rules.put(philHealth, ValidationRule.PHILHEALTH);
+        rules.put(tin, ValidationRule.TIN);
+        rules.put(pagIBIG, ValidationRule.PAGIBIG);
+        rules.put(phoneNum, ValidationRule.PHONE);
+        rules.put(birthday, ValidationRule.DATE_YYYYMMDD);
+        rules.put(address, ValidationRule.GENERIC_TEXT);
+        rules.put(immediateSupervisor, ValidationRule.NAME);
+        //Number Validation
+        rules.put(basicSalary, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(riceSub, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(phoneAllowance, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(clothingAllowance, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(monthlyRate, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(hourlyRate, ValidationRule.DECIMAL_NON_NEGATIVE);
+        //validation validation checker
+        String error = InputValidator.validate(rules);
+        if (error != null) {
+            JOptionPane.showMessageDialog(this, error, "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         Admin admin = new Admin("", "");
 
         JTextField[] textFields = {
@@ -690,12 +725,16 @@ public class AdminHRPortal extends javax.swing.JFrame {
     }//GEN-LAST:event_backtoAdminActionPerformed
 
     private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-    // Validate that at least employee number and name are filled
+    //
+        Map<javax.swing.JTextField, ValidationRule> rules = new HashMap<>();
+
+// Validate that at least employee number and name are filled
     if (empNum.getText().trim().isEmpty() || 
         lastName.getText().trim().isEmpty() || 
         firstName.getText().trim().isEmpty()) {
         JOptionPane.showMessageDialog(this, "Please fill in Employee Number, Last Name, and First Name.", "Incomplete Data", JOptionPane.WARNING_MESSAGE);
         return;
+        
     }
     String[] newRow = {
         empNum.getText().trim(),

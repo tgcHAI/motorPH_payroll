@@ -3,6 +3,12 @@
 import OOP.Employee;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import OOP.InputValidator;
+import OOP.ValidationRule;
+import java.awt.Component;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
 
 public class EmployeePortal extends javax.swing.JFrame {
 
@@ -32,6 +38,40 @@ public class EmployeePortal extends javax.swing.JFrame {
     
     public EmployeePortal() {
         initComponents();
+        Map<java.awt.Component, ValidationRule> rules = new HashMap<>();
+        
+        // Required fields
+        rules.put(empNumField, ValidationRule.REQUIRED);
+        rules.put(lastNameField, ValidationRule.REQUIRED);
+        rules.put(firstNameField, ValidationRule.REQUIRED);
+        rules.put(statusField, ValidationRule.REQUIRED);
+
+        // Format validations
+        rules.put(empNumField, ValidationRule.EMPLOYEE_ID);
+        rules.put(lastNameField, ValidationRule.NAME);
+        rules.put(firstNameField, ValidationRule.NAME);
+        rules.put(sssField, ValidationRule.SSS);
+        rules.put(philHealthField, ValidationRule.PHILHEALTH);
+        rules.put(tinField, ValidationRule.TIN);
+        rules.put(pagIbigField, ValidationRule.PAGIBIG);
+        rules.put(contactField, ValidationRule.PHONE);
+        rules.put(birthdayField, ValidationRule.DATE_YYYYMMDD);
+        rules.put(addressField, ValidationRule.GENERIC_TEXT);
+
+        // Numeric fields
+        rules.put(basicSalaryField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(hourlyRateField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(riceSubField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(phoneSubField, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(clothingField, ValidationRule.DECIMAL_NON_NEGATIVE);
+
+        // Validate
+        String error = InputValidator.validate(rules);
+        if (error != null) {
+            JOptionPane.showMessageDialog(this, error, "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+}
+        
     }
 
     /**
