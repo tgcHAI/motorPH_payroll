@@ -14,6 +14,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import OOP.InputValidator;
+import OOP.ValidationRule;
+import java.util.HashMap;
+import java.util.Map;
 
     
 
@@ -677,6 +681,40 @@ public class HRPortal extends javax.swing.JFrame {
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
 
+        Map<javax.swing.JTextField, ValidationRule> rules = new HashMap<>();
+        // Required fields
+        rules.put(empNum, ValidationRule.REQUIRED);
+        rules.put(lastName, ValidationRule.REQUIRED);
+        rules.put(firstName, ValidationRule.REQUIRED);
+        rules.put(position, ValidationRule.REQUIRED);
+        rules.put(status, ValidationRule.REQUIRED);
+        // Format validations
+        rules.put(empNum, ValidationRule.EMPLOYEE_ID);
+        rules.put(lastName, ValidationRule.NAME);
+        rules.put(firstName, ValidationRule.NAME);
+        rules.put(sss, ValidationRule.SSS);
+        rules.put(philHealth, ValidationRule.PHILHEALTH);
+        rules.put(tin, ValidationRule.TIN);
+        rules.put(pagIBIG, ValidationRule.PAGIBIG);
+        rules.put(phoneNum, ValidationRule.PHONE);
+        rules.put(birthday, ValidationRule.DATE_YYYYMMDD);
+        rules.put(address, ValidationRule.GENERIC_TEXT);
+        rules.put(immediateSupervisor, ValidationRule.NAME);
+        // Numeric fields (allow empty, but validate if filled)
+        rules.put(basicSalary, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(riceSub, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(phoneAllowance, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(clothingAllowance, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(monthlyRate, ValidationRule.DECIMAL_NON_NEGATIVE);
+        rules.put(hourlyRate, ValidationRule.DECIMAL_NON_NEGATIVE);
+        // Validation Validator
+        String error = InputValidator.validate(rules);
+        if (error != null) {
+            JOptionPane.showMessageDialog(this, error, "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        
         Admin admin = new Admin("", "");
 
         JTextField[] textFields = {
