@@ -7,12 +7,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.UUID;
+import FUNCTIONS.GoogleAuth.QRCodeGenerator;
 import FUNCTIONS.GoogleAuth.SecretKeyGenerator;
-import static FUNCTIONS.GoogleAuth.SecretKeyGenerator.generateSecretKey;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import FUNCTIONS.GoogleAuth.TOTPValidator;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SystemIT extends User {
     public static final String EMPLOYEE_CSV = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "CSV" + File.separator + "EmpData.csv";
@@ -32,201 +38,342 @@ public class SystemIT extends User {
     }
     
     public static void main(String args[]){
-        checkSecretKey("user2@motorPH.com", "password2");
+        // Test enrollment
+        JFrame dummyFrame = new JFrame();
+        String secret = enrollMFA("user2@motorph.com", EMPLOYEE_CSV, dummyFrame);
+        System.out.println("Enrolled with secret: " + secret);
     }
 
-    public static void helperMFAFunction(String email, JFrame loginFrame) {
-        
-        //Error handling
-        if (email == null || loginFrame == null) {
-            throw new IllegalArgumentException("email and loginFrame must not be null");
-        }
+    // === NEW: SAFE TOTP SECRET STORAGE ===
+    public static void saveTotpSecret(String email, String secret) {
+        try {
+            Path csvPath = Paths.get(EMPLOYEE_CSV);
+            List<String> lines = Files.readAllLines(csvPath, StandardCharsets.UTF_8);
+            boolean headerSkipped = false;
+            boolean found = false;
 
-        // Ensure we run UI work on the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> {
-            // Hide the login window (do not dispose here so MFA can restore it on error)
-            loginFrame.setVisible(false);
-        });
-    }
-    
-    public static String checkSecretKey(String email, String password) {
-        try (BufferedReader br = new BufferedReader(new FileReader(EMPLOYEE_CSV))) {
-            String line;
-            boolean isFirstLine = true; // Flag to skip the header row
-            int lineCount = 1;
-            
-            while ((line = br.readLine()) != null) {
-                System.out.println(lineCount);
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    continue; // Skip the header line
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (!headerSkipped) {
+                    headerSkipped = true;
+                    continue;
                 }
 
+                String[] parts = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+                for (int j = 0; j < parts.length; j++) {
+                    parts[j] = parts[j].replaceAll("^\"|\"$", "").trim();
+                }
+                
+                if (parts.length <= CSV_TOTP_SECRET_COL_INDEX) {
+                    parts = Arrays.copyOf(parts, CSV_TOTP_SECRET_COL_INDEX + 1);
+                    for (int k = 0; k < parts.length; k++) {
+                        if (parts[k] == null) parts[k] = "";
+                    }
+                }
+
+                if (parts.length > CSV_EMAIL_COL_INDEX) {
+                    String csvEmail = parts[CSV_EMAIL_COL_INDEX];
+                    if (email.equalsIgnoreCase(csvEmail)) {
+                        parts[CSV_TOTP_SECRET_COL_INDEX] = "\"" + secret + "\"";
+                        lines.set(i, String.join(",", parts));
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (found) {
+                Files.write(csvPath, lines, StandardCharsets.UTF_8);
+                System.out.println("TOTP secret saved for: " + email);
+            } else {
+                System.err.println("User not found: " + email);
+            }
+        } catch (IOException e) {
+            System.err.println("CSV update failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // === NEW: MFA ENROLLMENT FLOW ===
+    private static String enrollMFA(String email, String csvPath, JFrame loginFrame) {
+        String secret = SecretKeyGenerator.generateSecretKey();
+        saveTotpSecret(email, secret);
+        
+        String issuer = "MotorPH";
+        String otpUrl = String.format(
+            "otpauth://totp/%s:%s?secret=%s&issuer=%s",
+            issuer, email, secret, issuer
+        );
+        
+        try {
+            String qrPath = System.getProperty("user.dir") + File.separator + "mfa_setup.png";
+            QRCodeGenerator.generateQRCode(otpUrl, qrPath, 300, 300);
+            showMFAEnrollmentDialog(email, qrPath, secret, loginFrame);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Failed to generate QR code: " + e.getMessage(), 
+                                        "MFA Setup Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return secret;
+    }
+
+    private static void showMFAEnrollmentDialog(String email, String qrPath, String secret, JFrame loginFrame) {
+        JFrame frame = new JFrame("Set Up Authenticator App");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        
+        try {
+            BufferedImage img = ImageIO.read(new File(qrPath));
+            JLabel qrLabel = new JLabel(new ImageIcon(img));
+            frame.add(qrLabel, BorderLayout.CENTER);
+        } catch (IOException e) {
+            frame.add(new JLabel("Failed to load QR code"), BorderLayout.CENTER);
+        }
+        
+        JTextArea instructions = new JTextArea(
+            "1. Install Google Authenticator (or similar app)\n" +
+            "2. Tap '+' → 'Scan QR code'\n" +
+            "3. Enter the 6-digit code below to verify setup\n\n" +
+            "Can't scan? Enter this key manually:\n" + secret
+        );
+        instructions.setEditable(false);
+        instructions.setWrapStyleWord(true);
+        instructions.setLineWrap(true);
+        frame.add(instructions, BorderLayout.SOUTH);
+        
+        JTextField otpField = new JTextField(10);
+        otpField.setFont(new Font("Monospaced", Font.BOLD, 16));
+        frame.add(otpField, BorderLayout.NORTH);
+        
+        JButton verifyBtn = new JButton("Verify & Complete Setup");
+        verifyBtn.addActionListener(e -> {
+            try {
+                if (TOTPValidator.validateOTP(secret, otpField.getText().trim())) {
+                    JOptionPane.showMessageDialog(frame, "MFA setup successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    completeLogin(email, loginFrame);
+                    frame.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Invalid code. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (GeneralSecurityException ex) {
+                Logger.getLogger(SystemIT.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        frame.add(verifyBtn, BorderLayout.EAST);
+        
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    // === NEW: MFA CHALLENGE FLOW ===
+    private static void showMFAChallengeDialog(String email, String secret, JFrame loginFrame) {
+        JDialog dialog = new JDialog((Frame) null, "Two-Factor Authentication", true);
+        dialog.setLayout(new FlowLayout());
+        
+        dialog.add(new JLabel("Enter 6-digit code from your authenticator app:"));
+        JTextField otpField = new JTextField(10);
+        otpField.setFont(new Font("Monospaced", Font.BOLD, 16));
+        dialog.add(otpField);
+        
+        JButton verifyBtn = new JButton("Verify");
+        verifyBtn.addActionListener(e -> {
+            try {
+                if (TOTPValidator.validateOTP(secret, otpField.getText().trim())) {
+                    dialog.dispose();
+                    completeLogin(email, loginFrame);
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Invalid OTP. Please try again.",
+                            "Authentication Failed", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (GeneralSecurityException ex) {
+                Logger.getLogger(SystemIT.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        dialog.add(verifyBtn);
+        
+        dialog.getRootPane().setDefaultButton(verifyBtn);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    private static String getUserRole(String email) {
+        // Check Admin
+        try (BufferedReader br = new BufferedReader(new FileReader(ADMIN_CSV))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] parts = line.split(",", -1);
+                if (parts.length > 0 && email.equalsIgnoreCase(parts[0].trim())) 
+                    return "Admin";
+            }
+        } catch (IOException e) { /* ignore */ }
+
+        // Check HR
+        try (BufferedReader br = new BufferedReader(new FileReader(HR_CSV))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] parts = line.split(",", -1);
+                if (parts.length > 0 && email.equalsIgnoreCase(parts[0].trim())) 
+                    return "HR";
+            }
+        } catch (IOException e) { /* ignore */ }
+
+        // Check Finance
+        try (BufferedReader br = new BufferedReader(new FileReader(FINANCE_CSV))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] parts = line.split(",", -1);
+                if (parts.length > 0 && email.equalsIgnoreCase(parts[0].trim())) 
+                    return "Finance";
+            }
+        } catch (IOException e) { /* ignore */ }
+
+        // Check Employee (in EmpData.csv)
+        try (BufferedReader br = new BufferedReader(new FileReader(EMPLOYEE_CSV))) {
+            String line;
+            boolean first = true;
+            while ((line = br.readLine()) != null) {
+                if (first) { first = false; continue; }
+                String[] parts = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+                if (parts.length > CSV_EMAIL_COL_INDEX && 
+                    email.equalsIgnoreCase(parts[CSV_EMAIL_COL_INDEX].replaceAll("^\"|\"$", "").trim())) 
+                    return "Employee";
+            }
+        } catch (IOException e) { /* ignore */ }
+
+        return null; // Unknown role
+    }
+    
+    private static void completeLogin(String email, JFrame loginFrame) {
+        String role = getUserRole(email);
+        if (role == null) {
+            JOptionPane.showMessageDialog(null, "User role not found. Contact admin.", "Error", JOptionPane.ERROR_MESSAGE);
+            loginFrame.setVisible(true); // Return to login
+            return;
+        }
+
+        switch (role) {
+            case "Admin":
+                new AdminPortal().setVisible(true);
+                break;
+            case "HR":
+                new HRPortal().setVisible(true);
+                break;
+            case "Finance":
+                new FinancePortal().setVisible(true);
+                break;
+            case "Employee":
+                Employee emp = getEmployeeByEmail(email);
+                if (emp != null) {
+                    EmployeePortal portal = new EmployeePortal();
+                    portal.fillEmployeeDetails(emp);
+                    portal.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Employee data not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    loginFrame.setVisible(true);
+                    return;
+                }
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, "Unknown role: " + role, "Error", JOptionPane.ERROR_MESSAGE);
+                loginFrame.setVisible(true);
+                return;
+        }
+        
+        loginFrame.dispose(); // Close login window
+    }
+
+    private static Employee getEmployeeByEmail(String email) {
+        try (BufferedReader br = new BufferedReader(new FileReader(EMPLOYEE_CSV))) {
+            String line;
+            boolean isFirstLine = true;
+            while ((line = br.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
+                String[] values = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                for (int i = 0; i < values.length; i++) {
+                    values[i] = values[i].replaceAll("^\"|\"$", "").trim();
+                }
+                if (values.length > CSV_EMAIL_COL_INDEX && values[CSV_EMAIL_COL_INDEX].equals(email)) {
+                    return new Employee(
+                        values[CSV_EMAIL_COL_INDEX], values[CSV_PASSWORD_COL_INDEX],
+                        values[0], values[1], values[2], values[7], values[10],
+                        values[9], values[8], parseDoubleSafe(values[13]),
+                        parseDoubleSafe(values[18]), parseDoubleSafe(values[14]),
+                        parseDoubleSafe(values[15]), parseDoubleSafe(values[16]),
+                        values[3], values[6], values[4], values[5]
+                    );
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // === UPDATED: VALIDATE LOGIN WITH MFA ===
+    public static void validateLogin(String email, String password, JFrame loginFrame) {
+        System.out.println("Login attempt: " + email);
+        
+        String role = getRoleByEmailAndPassword(email, password);
+        if (role == null) {
+            JOptionPane.showMessageDialog(loginFrame, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        System.out.println("Role detected: " + role);
+
+        String secret = getTotpSecret(email);
+        System.out.println("TOTP secret: " + (secret.isEmpty() ? "NOT ENROLLED" : "ENROLLED"));
+        
+        if (secret.isEmpty()) {
+            enrollMFA(email, EMPLOYEE_CSV, loginFrame); // ✅ Pass loginFrame here
+        } else {
+            showMFAChallengeDialog(email, secret, loginFrame);
+        }
+    }
+
+    private static String getRoleByEmailAndPassword(String email, String password) {
+        if (checkCredentials(ADMIN_CSV, email, password)) return "Admin";
+        if (checkCredentials(HR_CSV, email, password)) return "HR";
+        if (checkCredentials(FINANCE_CSV, email, password)) return "Finance";
+        if (getEmployeeDetails(email, password) != null) return "Employee";
+        return null;
+    }
+
+    private static String getTotpSecret(String email) {
+        try (BufferedReader br = new BufferedReader(new FileReader(EMPLOYEE_CSV))) {
+            String line;
+            boolean isFirstLine = true;
+            while ((line = br.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
                 String[] parts = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-             
                 for (int i = 0; i < parts.length; i++) {
                     parts[i] = parts[i].replaceAll("^\"|\"$", "").trim();
                 }
-                System.out.println(Arrays.toString(parts));
-            
-                   
-                if (parts.length >= CSV_TOTP_SECRET_COL_INDEX) {
-                    String csvEmail = parts[CSV_EMAIL_COL_INDEX].trim();
-                    System.out.println(csvEmail);
-                    String csvPassword = parts[CSV_PASSWORD_COL_INDEX].trim();
-                    System.out.println(csvPassword);
-
-                    // Check if provided email and password match a record in the CSV
-                    if (email.equalsIgnoreCase(csvEmail) && password.equals(csvPassword)) {
-                // TOTP secret may or may not exist
-                String totpSecret = (parts.length > CSV_TOTP_SECRET_COL_INDEX)
-                        ? parts[CSV_TOTP_SECRET_COL_INDEX].trim()
-                        : ""; // treat missing column as empty -> enroll
-
-    if (totpSecret == null || totpSecret.isEmpty() || totpSecret.equalsIgnoreCase("null")) {
-        String[] path = parts;
-        System.out.println(Arrays.toString(path));
-        updateTotpSecret(EMPLOYEE_CSV, path, email, lineCount, br);
-        return "";
-    } else {
-        System.out.println("User '" + email + "' authenticated with existing TOTP secret.");
-        return totpSecret;
-    }
-        }
-             } else {
-                    // Log or handle malformed lines if necessary
-                    System.err.println("Skipping malformed line in CSV (not enough columns): " + line);
+                if (parts.length > CSV_EMAIL_COL_INDEX && 
+                    email.equalsIgnoreCase(parts[CSV_EMAIL_COL_INDEX])) {
+                    return (parts.length > CSV_TOTP_SECRET_COL_INDEX) ? 
+                           parts[CSV_TOTP_SECRET_COL_INDEX] : "";
                 }
-                
-                lineCount += 1;
-                
             }
-            System.out.println("Authentication failed for user: " + email + " (user not found or invalid password).");
-            return null; 
         } catch (IOException e) {
-            System.err.println("Error reading employee data from file: " + e.getMessage());
             e.printStackTrace();
         }
         return "";
     }
-    
-    public static String updateTotpSecret(String csvPath, String[] updateRow, String email, int lineCount, BufferedReader br) throws IOException {
-        Path csvFile = Paths.get(csvPath);
-        Path tempFile = Files.createTempFile(csvFile.getParent(), "csv-update-", ".tmp");
-        String updatedSecret = null;
-        boolean found = false;
 
-        if (br == null) {
-            try (BufferedReader reader = Files.newBufferedReader(csvFile, StandardCharsets.UTF_8);
-                 BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8)) {
-                processReaderAndWrite(reader, writer, updateRow, email);
-            }
-        } else {
-            BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8);
-            try {
-                updatedSecret = processReaderAndWriteReturnSecret(br, writer, updateRow, email);
-                if (updatedSecret != null) found = true;
-            } finally {
-                writer.close();
-            }
-        }
-
-    try {
-        Files.move(tempFile, csvFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-    } catch (AtomicMoveNotSupportedException ex) {
-        Files.move(tempFile, csvFile, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    return updatedSecret;
-}
-
-private static String processReaderAndWriteReturnSecret(BufferedReader reader, BufferedWriter writer, String[] updateRow, String email) throws IOException {
-    String header = reader.readLine();
-    if (header == null) {
-        throw new IOException("CSV file is empty: " + " (path unknown in this helper)");
-    }
-    writer.write(header);
-    writer.newLine();
-
-    String line;
-    String updatedSecret = null;
-
-    String splitRegex = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
-
-    while ((line = reader.readLine()) != null) {
-        String[] parts = line.split(splitRegex, -1);
-
-        for (int i = 0; i < parts.length; i++) {
-            parts[i] = parts[i].replaceAll("^\"|\"$", "").trim();
-        }
-
-        // Check for email match
-        if (CSV_EMAIL_COL_INDEX < parts.length && parts[CSV_EMAIL_COL_INDEX].equalsIgnoreCase(email)) {
-            String newSecret = null;
-            if (updateRow != null && updateRow.length > CSV_TOTP_SECRET_COL_INDEX && updateRow[CSV_TOTP_SECRET_COL_INDEX] != null) {
-                newSecret = updateRow[CSV_TOTP_SECRET_COL_INDEX];
-            } else {
-                newSecret = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-            }
-
-            // ensure array is large enough
-            if (parts.length <= CSV_TOTP_SECRET_COL_INDEX) {
-                parts = Arrays.copyOf(parts, CSV_TOTP_SECRET_COL_INDEX + 1);
-                for (int k = 0; k < parts.length; k++) {
-                    if (parts[k] == null) parts[k] = "";
-                }
-            }
-            parts[CSV_TOTP_SECRET_COL_INDEX] = newSecret;
-            updatedSecret = newSecret;
-        }
-
-        writer.write(joinCsv(parts));
-        writer.newLine();
-    }
-
-    writer.flush();
-    return updatedSecret;
-}
-
-private static String processReaderAndWrite(BufferedReader reader, BufferedWriter writer, String[] updateRow, String email) throws IOException {
-    return processReaderAndWriteReturnSecret(reader, writer, updateRow, email);
-}
-
-private static String joinCsv(String[] parts) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < parts.length; i++) {
-        if (i > 0) sb.append(',');
-        sb.append(escapeCsv(parts[i]));
-    }
-    return sb.toString();
-}
-
-private static String escapeCsv(String field) {
-    if (field == null) return "";
-    boolean needQuotes = field.contains(",") || field.contains("\"") || field.contains("\n") || field.contains("\r");
-    String escaped = field.replace("\"", "\"\"");
-    return needQuotes ? ("\"" + escaped + "\"") : escaped;
-}
-
-    
-    
-    public static void validateLogin(String email, String password, JFrame loginFrame) {
-        if (checkCredentials(ADMIN_CSV, email, password)) {
-            redirectToPortal(new Admin(email, password), new AdminPortal(), "Admin", loginFrame);
-        } else if (checkCredentials(HR_CSV, email, password)) {
-            redirectToPortal(new HR(email, password), new HRPortal(), "HR", loginFrame);
-        } else if (checkCredentials(FINANCE_CSV, email, password)) {
-            redirectToPortal(new Finance(email, password), new FinancePortal(), "Finance", loginFrame);
-        } else {
-            Employee employee = getEmployeeDetails(email, password);
-            if (employee != null) {
-                showEmployeePortal(employee, loginFrame);
-            } else {
-                JOptionPane.showMessageDialog(null, "Login Failed! Incorrect email or password.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
+    // === PRESERVED EXISTING METHODS (MINOR TWEAKS) ===
     private static boolean checkCredentials(String filePath, String email, String password) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -292,7 +439,7 @@ private static String escapeCsv(String field) {
         return null;
     }
 
-        private static double parseDoubleSafe(String value) {
+    private static double parseDoubleSafe(String value) {
         if (value == null || value.isEmpty()) return 0.0;  // Default to 0 if empty
         return Double.parseDouble(value.replace(",", "")); // Remove commas and parse
     }
@@ -301,10 +448,6 @@ private static String escapeCsv(String field) {
         JOptionPane.showMessageDialog(null, "Successfully Logged In as " + role + "!");
         portal.setVisible(true);
         loginFrame.dispose();
-    }
-    
-    private static void redirectToMFA(String email){
-        
     }
 
     private static void showEmployeePortal(Employee employee, JFrame loginFrame) {
